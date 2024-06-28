@@ -22,12 +22,22 @@ var books = []book{
 func getBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
+func getBook(c *gin.Context) {
+	id := c.Param("id")
+	for _, b := range books {
+		if b.ID == id {
+			c.JSON(http.StatusOK, b)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "Book not found"})
+}
 
 func main() {
 	r := gin.Default()
 
 	r.GET("/books", getBooks)
-	// r.GET("/books/:id", getBook)
+	r.GET("/books/:id", getBook)
 	// r.POST("/books", createBook)
 	// r.PUT("/books/:id", updateBook)
 	// r.DELETE("/books/:id", deleteBook)
