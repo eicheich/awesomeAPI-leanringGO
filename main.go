@@ -1,46 +1,27 @@
 package main
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
+	"awesomeAPI/models"
+	"awesomeAPI/controllers/usercontroller"
+	// "database/sql"
 	// "errors"
+	// "fmt"
+	// "log"
+	// "net/http"
+	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-type book struct {
-	ID string `json:"id"`
-	Title string `json:"title"`
-	Author string `json:"author"`
-	Qty int `json:"qty"`
-}
-
-var books = []book{
-	{ID: "1", Title: "Golang", Author: "Google", Qty: 10},
-	{ID: "2", Title: "Java", Author: "Oracle", Qty: 20},
-	{ID: "3", Title: "Python", Author: "Python Software Foundation", Qty: 30},
-}
-
-func getBooks(c *gin.Context) {
-	c.JSON(http.StatusOK, books)
-}
-func getBook(c *gin.Context) {
-	id := c.Param("id")
-	for _, b := range books {
-		if b.ID == id {
-			c.JSON(http.StatusOK, b)
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Book not found"})
-}
 
 func main() {
 	r := gin.Default()
+	models.ConnectDatabase()
+	
+	r.GET("/users", usercontroller.Index)
+	// r.GET("/users/:id", userController.show)
+	// r.POST("/users", userController.store)
+	// r.PUT("/users/:id", userController.update)
+	// r.DELETE("/users/:id", userController.destroy)
 
-	r.GET("/books", getBooks)
-	r.GET("/books/:id", getBook)
-	// r.POST("/books", createBook)
-	// r.PUT("/books/:id", updateBook)
-	// r.DELETE("/books/:id", deleteBook)
-
-	r.Run("localhost:8080")
+	
 }
