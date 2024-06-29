@@ -18,10 +18,7 @@ func main() {
 	models.ConnectDatabase()
 	
 	r.GET("/users", usercontroller.Index)
-	// r.GET("/users/:id", userController.show)
-	// r.POST("/users", userController.store)
-	// r.PUT("/users/:id", userController.update)
-	// r.DELETE("/users/:id", userController.destroy)
+	r.POST("/users", usercontroller.Create)
 
-	
+	r.Run()
 }
