@@ -8,7 +8,7 @@ type User struct {
 }
 
 type CreateUserInput struct {
-	Username string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required"`
+	Username string `json:"username" binding:"required" gorm:"unique"`
+	Email    string `json:"email" binding:"required,email" gorm:"unique"`
 	Password string `json:"password" binding:"required"`
 }

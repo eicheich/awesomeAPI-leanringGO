@@ -3,6 +3,7 @@ package main
 import (
 	"awesomeAPI/models"
 	"awesomeAPI/controllers/usercontroller"
+	"awesomeAPI/controllers/labelcontroller"
 	// "database/sql"
 	// "errors"
 	// "fmt"
@@ -17,8 +18,19 @@ func main() {
 	r := gin.Default()
 	models.ConnectDatabase()
 	
-	r.GET("/users", usercontroller.Index)
-	r.POST("/users", usercontroller.Create)
+	users := r.Group("/users")
+	{
+		users.GET("", usercontroller.Index)
+		users.POST("", usercontroller.Create)
+		users.GET("/:id", usercontroller.Show)
+		users.PATCH("/:id", usercontroller.Update)
+		users.DELETE("/:id", usercontroller.Delete)
+	}
+
+	labels := r.Group("/labels")
+	{
+		labels.GET("/:id", labelcontroller.ShowLabel)
+	}
 
 	r.Run()
 }
