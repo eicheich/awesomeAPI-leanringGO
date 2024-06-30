@@ -34,9 +34,11 @@ func main() {
 		auth.GET("/profile", middleware.RequireAuth, usercontroller.Profile)
 	}
 
+	r.Use(middleware.RequireAuth)
+
 	labels := r.Group("/labels")
 	{
-		labels.GET("/:id", labelcontroller.ShowLabel)
+		labels.GET("/all", labelcontroller.ShowLabel)
 	}
 
 	r.Run()

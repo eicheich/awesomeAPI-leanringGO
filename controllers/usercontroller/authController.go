@@ -32,6 +32,7 @@ func Login(c *gin.Context) {
 	}
 
 	claims := &middleware.Claims{
+		ID:       user.ID,
 		Username: user.Username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // Set token expiration to 24 hours from now
@@ -47,12 +48,6 @@ func Login(c *gin.Context) {
 
 func Profile(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
-	if tokenString == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing authorization token"})
-		c.Abort()
-		return
-	}
-
 	claims, err := middleware.ParseToken(tokenString)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
