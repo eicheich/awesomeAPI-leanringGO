@@ -1,9 +1,11 @@
 package main
 
 import (
-	"awesomeAPI/models"
-	"awesomeAPI/controllers/usercontroller"
 	"awesomeAPI/controllers/labelcontroller"
+	"awesomeAPI/controllers/usercontroller"
+	"awesomeAPI/middleware"
+	"awesomeAPI/models"
+
 	// "database/sql"
 	// "errors"
 	// "fmt"
@@ -25,6 +27,11 @@ func main() {
 		users.GET("/:id", usercontroller.Show)
 		users.PATCH("/:id", usercontroller.Update)
 		users.DELETE("/:id", usercontroller.Delete)
+	}
+	auth := r.Group("/auth")
+	{
+		auth.POST("/login", usercontroller.Login)
+		auth.GET("/profile", middleware.RequireAuth, usercontroller.Profile)
 	}
 
 	labels := r.Group("/labels")

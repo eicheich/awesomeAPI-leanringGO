@@ -4,6 +4,8 @@ import (
 	"awesomeAPI/models"
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 
 )
 
@@ -17,32 +19,34 @@ func Index(c *gin.Context) {
 
 func Create(c *gin.Context) {
 	var input models.CreateUserInput
-	// check if username is unique
-	username := input.Username
-	var user models.User
-	models.DB.Where("username = ?", username).First(&user)
-	if user.Username == username {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
-		return
-	}
-
-	// check if email is unique
-	email := input.Email
-	models.DB.Where("email = ?", email).First(&user)
-	if user.Email == email {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
-		return
-	}
-
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	user = models.User{Username: input.Username, Email: input.Email, Password: input.Password}
-	models.DB.Create(&user)
+	// Check if username is unique
+	username := input.Username
+	var existingUser models.User
+	if err := models.DB.Where("username = ?", username).First(&existingUser).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Username is unique, proceed with creating the user
+			// Encrypt the password
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to encrypt password"})
+				return
+			}
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+			user := models.User{Username: input.Username, Email: input.Email, Password: string(hashedPassword)}
+			models.DB.Create(&user)
+
+			c.JSON(http.StatusOK, gin.H{"data": user})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check username uniqueness"})
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+	}
 }
 
 func Show(c *gin.Context) {
