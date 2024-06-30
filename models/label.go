@@ -28,3 +28,12 @@ func GetLabelByID(id int) (*Label, error) {
 
 	return &label, nil
 }
+
+func CreateLabel(label *Label) error {
+	if err := DB.Create(label).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+

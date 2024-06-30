@@ -19,6 +19,11 @@ import (
 func main() {
 	r := gin.Default()
 	models.ConnectDatabase()
+
+	// migrate database dari model
+	models.DB.AutoMigrate(&models.User{}, &models.Label{})
+	// r.Run(":8080")
+	
 	
 	users := r.Group("/users")
 	{
@@ -39,6 +44,7 @@ func main() {
 	labels := r.Group("/labels")
 	{
 		labels.GET("/all", labelcontroller.ShowLabel)
+		labels.POST("/create", labelcontroller.CreateLabel)
 	}
 
 	r.Run()
